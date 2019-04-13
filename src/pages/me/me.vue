@@ -1,6 +1,7 @@
 <template>
   <div>
     <div class="container">
+      <!-- <p>{{ userinfo.openId }}</p> -->
       <div class="userinfo">
         <img :src="userinfo.avatarUrl" alt="" />
         <p>{{userinfo.nickName}}</p>
@@ -14,12 +15,15 @@
 </template>
 
 <script>
-import config from '@/config'
-import {weLogin} from '@/utils'
+import {weLogin, post, showModal} from '@/utils'
 import YearProgress from '@/components/YearProgress'
 export default {
+
   created () {
-    // this.isLogin = wx.getStorageSync('userInfo')
+    this.isLogin = !!wx.getStorageSync('userInfo')
+    if (this.isLogin) {
+      this.userinfo = wx.getStorageSync('userInfo')
+    }
   },
   components: {
     YearProgress
@@ -27,7 +31,7 @@ export default {
   data () {
     return {
       userinfo: {
-        avatarUrl: '../../../static/img/unlogin.png',
+        avatarUrl: '/static/img/unlogin.png',
         nickName: '未登录'
       },
       isLogin: false
@@ -37,22 +41,28 @@ export default {
     // 登录函数
     async doLogin () {
       if (!this.isLogin) {
-        this.userinfo = await weLogin(config.loginUrl)
+        this.userinfo = await weLogin()
         this.isLogin = !!wx.getStorageSync('userInfo')
       }
-      console.log(this.userinfo)
     },
     scanBook () {
       wx.scanCode({
-        success (res) {
+        success: (res) => {
           console.log(res)
+          this.addBook(res.result)
         }
       })
-    }
-  },
-  watch: {
-    isLogin () {
-      return wx.getStorageSync('userInfo')
+    },
+    async addBook (isbn) {
+      const res = await post('/weapp/addbook', {
+        isbn,
+        openid: this.userinfo.openId
+      })
+      if (res.code === 0) {
+        showModal('添加成功', `《${res.data.title}》添加成功`)
+      } else {
+        showModal('添加失败', res.data.msg)
+      }
     }
   }
 }

@@ -1,17 +1,32 @@
 <template>
   <div>
-    <div>图书列表页面</div>
-    <i-modal title="用户登录" v-bind:visible="visible1" bind:ok="handleClose1" bind:cancel="handleClose1">
-      <view>是否允许获取微信用户信息</view>
-    </i-modal>
+    <Card :key='book.id' v-for="book in books" :book="book"></Card>
   </div>
 </template>
 
 <script>
+import {get} from '@/utils'
+import Card from '@/components/Card'
 export default {
+  mounted () {
+    this.getBooks()
+  },
+  onShow () {
+    this.getBooks()
+  },
+  components: {
+    Card
+  },
   data () {
     return {
-      visible1: true
+      books: []
+    }
+  },
+  methods: {
+    async getBooks () {
+      const res = await get('/weapp/booklist')
+      console.log(res)
+      this.books = res.data.books
     }
   }
 }

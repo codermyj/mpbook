@@ -1,4 +1,27 @@
 import qcloud from 'wafer2-client-sdk'
+import config from './config'
+import Fly from 'flyio/dist/npm/wx'
+
+var fly = new Fly()
+
+export function get (url, data) {
+  return fly.get(`${config.host}${url}`, data).then(res => {
+    return res.data
+  })
+}
+export function post (url, data) {
+  return fly.post(`${config.host}${url}`, data).then(res => {
+    return res.data
+  })
+}
+
+export function showModal (title, content) {
+  wx.showModal({
+    title,
+    content,
+    showCancel: false
+  })
+}
 
 export function showSuccess (text) {
   wx.showToast({
@@ -7,12 +30,11 @@ export function showSuccess (text) {
   })
 }
 
-export function weLogin (url) {
+export function weLogin () {
   return new Promise((resolve, reject) => {
-    qcloud.setLoginUrl(url)
+    qcloud.setLoginUrl(config.loginUrl)
     qcloud.login({
       success (userInfo) {
-        // console.log('登录成功', userInfo)
         wx.setStorageSync('userInfo', userInfo)
         resolve(userInfo)
       },
