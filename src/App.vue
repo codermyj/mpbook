@@ -21,6 +21,14 @@ export default {
 </script>
 
 <style>
+.text-footer{
+  text-align: center;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+.text-primary{
+  color: #2d8cf0
+}
 .btn{
   color: white;
   background: #2d8cf0;

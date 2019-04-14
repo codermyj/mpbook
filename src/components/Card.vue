@@ -1,12 +1,13 @@
 <template>
+<a :href="detailUrl">
   <div class="book-card">
     <div class="thumb">
       <img :src="book.image" class="img" mode="aspectFit">
     </div>
     <div class="detail">
-      <div class="row">
+      <div class="row text-primary">
         <div class="right">
-          {{book.pages}}页
+          {{book.pages}} <Rate :value="book.pages/100"></Rate>
         </div>
          <div class="left">
           {{ book.title }}
@@ -14,7 +15,7 @@
       </div>
       <div class="row">
         <div class="right">
-         浏览量
+         浏览量: {{book.count}}
         </div>
         <div class="left">
            {{book.author}}
@@ -22,7 +23,7 @@
       </div>
       <div class="row">
         <div class="right">
-          添加人
+          添加人:{{book.user_info.nickName}}
         </div>
         <div class="left">
           {{ book.publisher }}
@@ -30,11 +31,21 @@
       </div>
     </div>
   </div>
+  </a>
 </template>
 
 <script>
+import Rate from '@/components/Rate'
 export default {
-  props: ['book']
+  components: {
+    Rate
+  },
+  props: ['book'],
+  computed: {
+    detailUrl () {
+      return `/pages/detail/main?id=${this.book.id}`
+    }
+  }
 }
 </script>
 
@@ -88,18 +99,19 @@ export default {
   }
   .detail{
     margin-left: 100px;
-    margin-right: 30px;
     .row{
       line-height:20px;
       margin-bottom:3px;
     }
     .right{
       float: right;
+      margin-right: 10px
+      
     }
     .left{
       margin-right:80px;
     }
   }
-
+  
 }
 </style>
