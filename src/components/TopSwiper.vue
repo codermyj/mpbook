@@ -8,7 +8,7 @@
       class="swiper">
       <div :key="imgIndex" v-for="(urls, imgIndex) in imgUrls">
         <swiper-item >
-          <img class="slide-image" mode="aspectFit" :key="img.id" v-for="img in urls" :src="img.image"/>
+          <img @click="bookDetail(img)" class="slide-image" mode="aspectFit" :key="img.id" v-for="img in urls" :src="img.image"/>
         </swiper-item>
       </div> 
     </swiper>
@@ -22,6 +22,13 @@ export default {
     imgUrls () {
       let res = this.tops
       return [res.slice(0, 4), res.slice(4, 8), res.slice(8, 12)]
+    }
+  },
+  methods: {
+    bookDetail (img) {
+      wx.navigateTo({
+        url: `/pages/detail/main?id=${img.id}`
+      })
     }
   }
 }
