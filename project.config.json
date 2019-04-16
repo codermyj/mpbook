@@ -12,7 +12,7 @@
 	},
 	"miniprogramRoot": "dist/wx/",
 	"compileType": "miniprogram",
-	"appid": "",
+	"appid": "wxc5d1d8da091a3378",
 	"projectname": "mpbook",
 	"simulatorType": "wechat",
 	"simulatorPluginLibVersion": {},

@@ -16,11 +16,12 @@
           {{phone}}
         </span>
       </div>
+      <button class="btn" @click="addComment">评论</button>
     </div>
 </template>
 
 <script>
-import {get} from '@/utils'
+import {get, post} from '@/utils'
 import BookInfo from '@/components/BookInfo'
 
 export default {
@@ -29,13 +30,28 @@ export default {
   },
   data () {
     return {
+      userinfo: {},
       bookid: '',
       bookInfo: {},
       location: '',
-      phone: ''
+      phone: '',
+      comment: ''
     }
   },
   methods: {
+    // 评论 手机型号 位置 openid
+    async addComment () {
+      const data = {
+        openid: this.userinfo.openId,
+        bookid: this.bookid,
+        comment: this.comment,
+        phone: this.phone,
+        location: this.location
+
+      }
+      await post('/weapp/addcomment', data)
+      console.log(data)
+    },
     async getDetail () {
       let bookdetail = await get('/weapp/bookdetail', {id: this.bookid})
       console.log(bookdetail.data.title)
@@ -43,7 +59,7 @@ export default {
         title: bookdetail.data.title
       })
       this.bookInfo = bookdetail.data
-      this.bookInfo.detail = bookdetail.data.title.repeat(50)
+      this.bookInfo.detail = bookdetail.data.title.repeat(20)
     },
     getGeo (e) {
       const ak = '9ugdZD44BniceIzbPpiGlorKVK1qa24L'
@@ -88,6 +104,11 @@ export default {
   mounted () {
     this.bookid = this.$root.$mp.query.id
     this.getDetail()
+    const userinfo = wx.getStorageSync('userInfo')
+    if (userinfo) {
+      this.userinfo = userinfo
+      console.log(userinfo)
+    }
   }
 }
 </script>
@@ -98,7 +119,6 @@ export default {
   width: 730rpx;
   background: #eee;
   padding: 10rpx;
-  margin-top: 450rpx;
 }
   .location{
     margin-top: 10px;
