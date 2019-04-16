@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import {get, post} from '@/utils'
+import {get, post, showModal} from '@/utils'
 import BookInfo from '@/components/BookInfo'
 
 export default {
@@ -30,6 +30,7 @@ export default {
   },
   data () {
     return {
+      comments: [],
       userinfo: {},
       bookid: '',
       bookInfo: {},
@@ -49,8 +50,11 @@ export default {
         location: this.location
 
       }
-      await post('/weapp/addcomment', data)
-      console.log(data)
+      try {
+        await post('/weapp/addcomment', data)
+      } catch (e) {
+        showModal('评论失败', e.msg)
+      }
     },
     async getDetail () {
       let bookdetail = await get('/weapp/bookdetail', {id: this.bookid})
@@ -99,11 +103,16 @@ export default {
         this.phone = ''
       }
       // console.log(e)
+    },
+    async getComments () {
+      const comments = await get('/weapp/commentlist', {bookid: this.bookid})
+      this.comments = comments
     }
   },
   mounted () {
     this.bookid = this.$root.$mp.query.id
     this.getDetail()
+    this.getComments()
     const userinfo = wx.getStorageSync('userInfo')
     if (userinfo) {
       this.userinfo = userinfo
