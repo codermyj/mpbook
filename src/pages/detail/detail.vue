@@ -1,7 +1,10 @@
 <template>
     <div>
       <BookInfo :info="bookInfo"></BookInfo>
-      <textarea v-model="comment" class="textarea" placeholder="请输入图书评论" :maxlength="100"></textarea>
+      <CommentList :comments="comments"></CommentList>
+      <!--{{showAdd}}-->
+      <div class="comment" v-if="showAdd">
+        <textarea v-model="comment" class="textarea" placeholder="请输入图书评论" :maxlength="100"></textarea>
       <div class="location">
         地理位置:
         <switch color="2d8cf0" :checked="location" @change="getGeo" />
@@ -18,15 +21,36 @@
       </div>
       <button class="btn" @click="addComment">评论</button>
     </div>
+      <div v-else class="text-footer">
+        {{theMsg}}
+      </div>
+      <button open-type="share" class="btn">转发给好友</button>
+    </div>
 </template>
 
 <script>
 import {get, post, showModal} from '@/utils'
 import BookInfo from '@/components/BookInfo'
+import CommentList from '@/components/CommentList'
 
 export default {
   components: {
-    BookInfo
+    BookInfo, CommentList
+  },
+  computed: {
+    showAdd () {
+      // 没登录
+      if (!this.userinfo.openId) {
+        this.theMsg = '您还未登录'
+        return false
+      }
+      // 已经评论过
+      if (this.comments.filter(v => v.openid === this.userinfo.openId).length) {
+        this.theMsg = '您已经评论过了~'
+        return false
+      }
+      return true
+    }
   },
   data () {
     return {
@@ -36,7 +60,8 @@ export default {
       bookInfo: {},
       location: '',
       phone: '',
-      comment: ''
+      comment: '',
+      theMsg: ''
     }
   },
   methods: {
@@ -55,6 +80,7 @@ export default {
       } catch (e) {
         showModal('评论失败', e.msg)
       }
+      this.getComments()
     },
     async getDetail () {
       let bookdetail = await get('/weapp/bookdetail', {id: this.bookid})
@@ -66,7 +92,7 @@ export default {
       this.bookInfo.detail = bookdetail.data.title.repeat(20)
     },
     getGeo (e) {
-      const ak = '9ugdZD44BniceIzbPpiGlorKVK1qa24L'
+      const ak = ''
       let url = 'http://api.map.baidu.com/geocoder/v2/'
       if (e.target.value) {
         wx.getLocation({
@@ -106,7 +132,7 @@ export default {
     },
     async getComments () {
       const comments = await get('/weapp/commentlist', {bookid: this.bookid})
-      this.comments = comments
+      this.comments = comments.data.list || []
     }
   },
   mounted () {
@@ -122,17 +148,24 @@ export default {
 }
 </script>
 
-<style>
-.textarea{
-  height: 200rpx;
-  width: 730rpx;
-  background: #eee;
-  padding: 10rpx;
-}
+<style lang="scss">
+  .comment{
+    margin-top:10px;
+  .textarea{
+    width:730rpx;
+    height:200rpx;
+    background:#eee;
+    padding:10rpx;
+  }
   .location{
-    margin-top: 10px;
+    margin-top:10px;
+    padding:5px 10px;
   }
   .phone{
-    margin-top: 10px;
+    margin-top:10px;
+    padding:5px 10px;
+
   }
+  }
+
 </style>
